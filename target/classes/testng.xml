@@ -1,8 +1,0 @@
-<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >  
-<suite name="com.touyun.scheduler" >
-	<test name="allClass">
-		<packages>
-			<package name="com.touyun.scheduler.*"></package>
-		</packages>
-	</test>
-</suite> 
