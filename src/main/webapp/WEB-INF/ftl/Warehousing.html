@@ -1,0 +1,448 @@
+<#-- 全局变量 --> <#global ctx="${(ctp.contextPath)!''}">
+<!DOCTYPE html>
+<html dir="ltr" lang="en-US" style="background-color: #F1F1F1;">
+<head>
+<meta charset="UTF-8" />
+<meta http-equiv="pragma" content="no-cache" />
+<meta HTTP-EQUIV="Cache-Control" CONTENT="no-cache, must-revalidate">
+<meta HTTP-EQUIV="expires" CONTENT="0">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1 maximum-scale=1,minimum-scale=1, user-scalable=no" />
+<title>出入库管理</title>
+<link href="${ctx}/static/css/bootstrap.min.css" rel="stylesheet">
+<link href="${ctx}/static/css/font-awesome.min.css" rel="stylesheet">
+<link rel="stylesheet" type="text/css" media="all"
+	href="${ctx}/static/css/daterangepicker-bs3.css" />
+<script type="text/javascript" src="${ctx}/static/js/jquery.min.js"></script>
+<script type="text/javascript" src="${ctx}/static/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="${ctx}/static/js/moment.js"></script>
+<script type="text/javascript" src="${ctx}/static/js/daterangepicker.js"></script>
+<style type="text/css">
+table {
+	text-align: center;
+}
+
+th {
+	text-align: center;
+}
+
+.width30 {
+	width: 30%;
+}
+
+.width15 {
+	width: 15%;
+}
+.width55 {
+	width: 55%;
+}
+
+
+.width25 {
+	width: 25%;
+}
+
+body {
+	font-family: Microsoft JhengHei;
+	font-weight: bolder;
+}
+
+.ttt {
+	font-size: 18px;
+	width: 20%;
+	background-color: #293C4D;
+	color: white;
+	border-width: 0px;
+	line-height: 30px;
+}
+
+.btn {
+	background-color: #293C4D;
+	color: white;
+	border-width: 0px;
+	line-height: 30px;
+}
+
+.ttt:hover, .ttt:focus, .ttt:active, .open>.dropdown-toggle.ttt {
+	color: white;
+	background-color: #18232E;
+}
+
+.form-control:hover, .form-control:focus, .form-control:active, .open>.dropdown-toggle.form-control
+	{
+	cursor: default;
+}
+</style>
+<script type="text/javascript">
+	
+	<!-- 用户改变日期 -->
+	function datechange() {
+		var dateStart = document.getElementsByName("daterangepicker_start")[0].value;
+		var dateEnd = document.getElementsByName("daterangepicker_end")[0].value;
+		var myDate = dateStart + " - " + dateEnd;
+		document.getElementsByName("reservation")[0].value = myDate;
+		var myForm = document.getElementById("lf");
+		var bt = document.getElementsByName("bt")[0].value;
+		if(bt == "ta"){
+			myForm.action = "aggregateReport.htm";
+		}else if (bt == "tb") {
+			myForm.action = "checkInReport.htm";
+		}else {
+			myForm.action = "checkOutReport.htm";
+		}
+		myForm.submit(); 
+		
+	}
+	
+	<!-- 用户切换<概览，出库，入库> -->
+	function changeColor(bt) {
+		document.getElementsByName("bt")[0].value = bt;
+		var myForm = document.getElementById("lf");
+		if(bt == "ta"){
+			myForm.action = "aggregateReport.htm";
+		}else if (bt == "tb") {
+			myForm.action = "checkInReport.htm";
+		}else {
+			myForm.action = "checkOutReport.htm";
+		}
+		 
+		myForm.submit();
+	}
+	
+</script>
+</head>
+<body style="background-color: #F1F1F1;">
+
+	<div
+		style="width: 100%; background-color: #293C4D; text-align: center;">
+		<div style="font-size: 35px; color: white; padding: 10px 0;">宝丰
+			- 出入库管理</div>
+	</div>
+
+
+	<#if data.err?? >
+	<h1>服务器错误，请稍后再试</h1>
+	<#else>
+	<div class="row" style="margin-top: 30px;">
+		<div class="col-xs-6">
+			<div class="btn-group" style="width: 80%; margin-left: 20%;">
+				<#if data.bt == "ta">
+				<button type="button" data-toggle="tab"
+					style="background-color: #18232E;" class="btn btn-default ttt"
+					id="ta" onclick="changeColor('ta')">&nbsp;&nbsp;概览&nbsp;&nbsp;</button>
+				<#else>
+				<button type="button" data-toggle="tab" class="btn btn-default ttt"
+					id="ta" onclick="changeColor('ta')">&nbsp;&nbsp;概览&nbsp;&nbsp;</button>
+				</#if> <#if data.bt == "tb">
+				<button type="button" data-toggle="tab"
+					style="background-color: #18232E;" class="btn btn-default ttt"
+					id="tb" onclick="changeColor('tb')">入库报表</button>
+				<#else>
+				<button type="button" data-toggle="tab" class="btn btn-default ttt"
+					id="tb" onclick="changeColor('tb')">入库报表</button>
+				</#if> <#if data.bt == "tc">
+				<button type="button" data-toggle="tab"
+					style="background-color: #18232E;" class="btn btn-default ttt"
+					id="tb" onclick="changeColor('tc')">出库报表</button>
+				<#else>
+				<button type="button" data-toggle="tab" class="btn btn-default ttt"
+					id="tc" onclick="changeColor('tc')">出库报表</button>
+				</#if>
+			</div>
+		</div>
+		<div class="col-xs-6">
+			<form class="form-horizontal" style="width: 100%;" action="" id="lf"
+				method="post">
+				<fieldset>
+					<div class="control-group">
+						<div class="controls">
+
+							<input type="hidden" value="${data.bt}" name="bt"> <input
+								type="text" readonly
+								style="color: #18232E; font-size: 16px; text-align: center; width: 30%; min-width: 230px; float: right; margin-right: 20%"
+								name="reservation" id="reservation" class="form-control"
+								value="${data.md}" />
+						</div>
+					</div>
+				</fieldset>
+			</form>
+			<script type="text/javascript">
+				$(document).ready(
+						function() {
+							$('#reservation').daterangepicker(
+									null,
+									function(start, end, label) {
+										console.log(start.toISOString(), end
+												.toISOString(), label);
+									});
+						});
+			</script>
+		</div>
+	</div>
+
+
+	<div id="myTabContent" class="tab-content"
+		style="width: 80%; margin-left: 10%;">
+		<#if data.bt == "ta">
+		<div class="tab-pane fade in active" id="home">
+			<table class="table table-bordered table-striped"
+				style="color: #293C4D; font-size: 20px;">
+				<caption style="font-size: 16px; color: #293C4D;">总入库量：${data.inSum}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;总出库量：${data.outSum}</caption>
+				<thead style="">
+					<tr>
+						<th>时间</th>
+						<th>产品名称</th>
+						<th>入库量</th>
+						<th>出库量</th>
+					</tr>
+				</thead>
+				<tbody id="table2">
+					<#list data.list as key>
+					<tr>
+						<td class="width25">${key.inDate}</td>
+						<td class="width25">${key.pdName}</td>
+						<td class="width25">${key.inNum}</td>
+						<td class="width25">${key.outNum}</td>
+					</tr>
+					</#list>
+				</tbody>
+			</table>
+			<div style="width: 100%; text-align: right;">
+				<span id="spanFirst">第一页</span> <span id="spanPre">上一页</span> <span
+					id="spanNext">下一页</span> <span id="spanLast">最后一页</span> 第 <span
+					id="spanPageNum"></span>页/共 <span id="spanTotalPage"></span>页
+			</div>
+		</div>
+		</#if> <#if data.bt == "tb">
+		<div class="tab-pane fade in active" id="inhome">
+			<table class="table table-bordered table-striped"
+				style="color: #293C4D; font-size: 20px;">
+				<caption style="font-size: 16px; color: #293C4D;">总入库量：${data.inSum}</caption>
+				<thead>
+					<tr>
+						<th>时间</th>
+						<th>产品名称</th>
+						<th>入库量</th>
+					</tr>
+
+				</thead>
+				<tbody id="table2">
+					<#list data.list as key>
+					<tr>
+						<td class="width30">${key.inDate}</td>
+						<td class="width30">${key.pdName}</td>
+						<td class="width30">${key.inNum}</td>
+					</tr>
+					</#list>
+				</tbody>
+			</table>
+			<div style="width: 100%; text-align: right;">
+				<span id="spanFirst">第一页</span> <span id="spanPre">上一页</span> <span
+					id="spanNext">下一页</span> <span id="spanLast">最后一页</span> 第 <span
+					id="spanPageNum"></span>页/共 <span id="spanTotalPage"></span>页
+			</div>
+		</div>
+		</#if> <#if data.bt == "tc">
+		<div class="tab-pane fade in active" id="outhome">
+			<table class="table table-bordered table-striped"
+				style="color: #293C4D; font-size: 20px;">
+				<caption style="font-size: 16px; color: #293C4D;">总出库量：${data.outSum}</caption>
+				<thead>
+					<tr>
+						<th>时间</th>
+						<th>经销商</th>
+						<th>产品名称</th>
+						<th>出库量</th>
+					</tr>
+				</thead>
+				<tbody id="table2">
+					<#list data.list as key>
+					<tr>
+						<td class="width25">${key.outDate}</td>
+						<td class="width25">${key.dName}</td>
+						<td class="width25">${key.pdNames}</td>
+						<td class="width25">${key.outNum}</td>
+					</tr>
+					</#list>
+				</tbody>
+			</table>
+			<div style="width: 100%; text-align: right;">
+				<span id="spanFirst">第一页</span> <span id="spanPre">上一页</span> <span
+					id="spanNext">下一页</span> <span id="spanLast">最后一页</span> 第 <span
+					id="spanPageNum"></span>页/共 <span id="spanTotalPage"></span>页
+			</div>
+		</div>
+		</#if>
+	</div>
+	<script>
+		$(function() {
+			$('#myTab li:eq(1) a').tab('show');
+		});
+	</script>
+	</#if>
+</body>
+</html>
+<script>
+	var theTable = document.getElementById("table2");
+	var totalPage = document.getElementById("spanTotalPage");
+	var pageNum = document.getElementById("spanPageNum");
+
+	var spanPre = document.getElementById("spanPre");
+	var spanNext = document.getElementById("spanNext");
+	var spanFirst = document.getElementById("spanFirst");
+	var spanLast = document.getElementById("spanLast");
+
+	var numberRowsInTable = theTable.rows.length;
+	var pageSize = 10;
+	var page = 1;
+	var num = 0;
+
+	//下一页
+	function next() {
+		if(num <= 1){
+			return;
+		}
+		hideTable();
+
+		currentRow = pageSize * page;
+		maxRow = currentRow + pageSize;
+		if (maxRow > numberRowsInTable)
+			maxRow = numberRowsInTable;
+		for (var i = currentRow; i < maxRow; i++) {
+			theTable.rows[i].style.display = '';
+		}
+		page++;
+
+		if (maxRow == numberRowsInTable) {
+			nextText();
+			lastText();
+		}
+		showPage();
+		preLink();
+		firstLink();
+	}
+
+	//上一页
+	function pre() {
+		if(num <= 1){
+			return;
+		}
+		hideTable();
+
+		page--;
+
+		currentRow = pageSize * page;
+		maxRow = currentRow - pageSize;
+		if (currentRow > numberRowsInTable)
+			currentRow = numberRowsInTable;
+		for (var i = maxRow; i < currentRow; i++) {
+			theTable.rows[i].style.display = '';
+		}
+
+		if (maxRow == 0) {
+			preText();
+			firstText();
+		}
+		showPage();
+		nextLink();
+		lastLink();
+	}
+
+	//第一页
+	function first() {
+		if(num <= 1){
+			return;
+		}
+		hideTable();
+		page = 1;
+		for (var i = 0; i < pageSize; i++) {
+			theTable.rows[i].style.display = '';
+		}
+		showPage();
+
+		preText();
+		nextLink();
+		lastLink();
+	}
+
+	//最后一页
+	function last() {
+		if(num <= 1){
+			return;
+		}
+		hideTable();
+		page = pageCount();
+		currentRow = pageSize * (page - 1);
+		for (var i = currentRow; i < numberRowsInTable; i++) {
+			theTable.rows[i].style.display = '';
+		}
+		showPage();
+
+		preLink();
+		nextText();
+		firstLink();
+	}
+
+	function hideTable() {
+		for (var i = 0; i < numberRowsInTable; i++) {
+			theTable.rows[i].style.display = 'none';
+		}
+	}
+
+	function showPage() {
+		pageNum.innerHTML = page;
+	}
+
+	//总共页数
+	function pageCount() {
+		var count = 0;
+		if (numberRowsInTable % pageSize != 0)
+			count = 1;
+		num = parseInt(numberRowsInTable / pageSize) + count
+		return num;
+	}
+
+	//显示链接
+	function preLink() {
+		spanPre.innerHTML = "<a href='javascript:pre();'>上一页</a>";
+	}
+	function preText() {
+		spanPre.innerHTML = "上一页";
+	}
+
+	function nextLink() {
+		spanNext.innerHTML = "<a href='javascript:next();'>下一页</a>";
+	}
+	function nextText() {
+		spanNext.innerHTML = "下一页";
+	}
+
+	function firstLink() {
+		spanFirst.innerHTML = "<a href='javascript:first();'>第一页</a>";
+	}
+	function firstText() {
+		spanFirst.innerHTML = "第一页";
+	}
+
+	function lastLink() {
+		spanLast.innerHTML = "<a href='javascript:last();'>最后一页</a>";
+	}
+	function lastText() {
+		spanLast.innerHTML = "最后一页";
+	}
+
+	//隐藏表格
+	function hide() {
+		for (var i = pageSize; i < numberRowsInTable; i++) {
+			theTable.rows[i].style.display = 'none';
+		}
+
+		totalPage.innerHTML = pageCount();
+		pageNum.innerHTML = '1';
+
+		nextLink();
+		lastLink();
+	}
+
+	hide();
+</script>

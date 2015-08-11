@@ -1,0 +1,91 @@
+<#escape x as x?html> <@h.head/> <@h.navbar withMenu="yes"/>
+
+<@h.searchbarContainerStart/>
+<!-- the search bar items -->
+<div class="col-sm-12">
+	<div class="row">
+		<div class="col-sm-5">
+			<div class="row">
+				<div class="col-sm-7">
+					<input class="form-control" id="query-time" type="text"
+						placeholder="开始时间-结束时间" style="border-radius: 15px;"> <i
+						class="form-control-feedback glyphicon glyphicon-calendar"
+						style="color: #B1B3B7;"></i>
+				</div>
+				<div class="col-sm-5">
+					<input class="form-control" id="keyword" type="text"
+						placeholder="产品名称" style="border-radius: 15px;"> <i
+						class="form-control-feedback" style="color: #B1B3B7;"></i>
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-3">
+			<div class="row">
+				<div class="col-sm-6">
+					<input class="btn btn-default form-control form-control-button"
+						type="button" value="查询" onclick="queryReports(2)"> <i
+						class="form-control-feedback glyphicon glyphicon-search glyphicon-custom"
+						style="color: #FFF;"></i>
+				</div>
+				<div class="col-sm-6" style="visibility: hidden;">
+					<input class="btn btn-default form-control form-control-button"
+						type="button" value="导出" onclick="queryReports(0)"> <i
+						class="form-control-feedback glyphicon glyphicon-search glyphicon-custom"
+						style="color: #FFF;"></i>
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-4">
+			<div class="row">
+				<div class="col-sm-6">
+					<label id="totalInCount" style="margin-top: 7px; color: #ffffff;">入库总量:0</label>
+				</div>
+				<div class="col-sm-6">
+					<label id="totalOutCount" style="margin-top: 7px; color: #ffffff;">出库总量:0</label>
+				</div>
+			</div>
+
+		</div>
+	</div>
+</div>
+
+<@h.searchbarContainerEnd/>
+
+<div class="table-responsive custom-content-body">
+	<table id="warehouse-report-table" data-toggle="table" data-pagination="true"
+		data-side-pagination="server" data-page-size="15"
+		data-page-list="[5,10,15,20,25,50,100,200]" data-search="false">
+		<thead>
+			<tr>
+				<th data-field="inDate" data-sortable="true">时间</th>
+				<th data-field="pdName" data-sortable="true">产品名称</th>
+				<th data-field="inNum" data-sortable="true">入库量</th>
+				<th data-field="inOpe" data-sortable="true">入库员</th>
+				<th data-field="outNum" data-sortable="true">出库量</th>
+				<th data-field="outOpe" data-sortable="true">出库员</th>
+			</tr>
+		</thead>
+	</table>
+</div>
+
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$("li#aggregateWarehouseMenu").attr("class", "active");
+
+		$("#query-time").daterangepicker({
+			arrows : true,
+			format : 'YYYY-MM-DD',
+			separator : ' / ',
+			locale : {
+				applyLabel : '确定',
+				cancelLabel : '取消'
+			}
+		});
+		
+		$("#query-time").val(getCurrentDateStr()+ " / " + getCurrentDateStr());
+		queryReports(2);
+	});
+</script>
+
+<@h.footer/> </#escape>

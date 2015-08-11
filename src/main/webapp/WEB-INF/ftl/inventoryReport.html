@@ -1,0 +1,102 @@
+<#escape x as x?html> <@h.head/> <@h.navbar withMenu="yes"/>
+
+<@h.searchbarContainerStart/>
+<!-- the search bar items -->
+
+<div class="col-sm-12">
+	<div class="row">
+		<div class="col-sm-4">
+			<input class="form-control" id="keyword" type="text"
+				placeholder="产品名称" style="border-radius: 15px;"> <i
+				class="form-control-feedback" style="color: #B1B3B7;"></i>
+		</div>
+		<div class="col-sm-2">
+			<input class="btn btn-default form-control form-control-button"
+			type="button" value="查询" onclick="queryInventoryReportByProduct()"> <i
+			class="form-control-feedback glyphicon glyphicon-search glyphicon-custom"
+			style="color: #FFF;"></i>
+		</div>
+	</div>
+</div>
+
+<@h.searchbarContainerEnd/>
+
+<!-- tag registration window -->
+<div class="modal" id="inventory-report-detail-windows" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 id="damage-tag-replace-title" class="modal-title">详细日志</h4>
+			</div>
+			<div class="modal-body">
+				<table id="inventory-report-detail-table" data-height="350" data-toggle="table" data-search="false">
+					<thead>
+						<tr>
+							<th data-field="optTime" data-sortable="false">时间</th>
+							<th data-field="inCount" data-sortable="false" data-formatter="inventoryCountFormatter">入库量</th>
+							<th data-field="outCount" data-sortable="false" data-formatter="inventoryCountFormatter">出库量</th>
+							<th data-field="operator" data-sortable="false">操作人</th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+			<div class="modal-footer" style="text-align: center;">
+				<button type="button" class="btn btn-default" data-dismiss="modal" style="width: 80px; background: #00C1E3;color: #FFFFFF">确定</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<div class="table-responsive custom-content-body">
+	<table id="inventory-report-table" data-toggle="table"
+		data-url="${ctx}/warehouse/inventory.htm" data-pagination="true"
+		data-side-pagination="server" data-page-size="15"
+		data-page-list="[5,10,15,20,25,50,100,200]" data-search="false">
+		<thead>
+			<tr>
+				<th data-field="productName" data-sortable="true">产品名称</th>
+				<th data-field="inventoryCount" data-sortable="true">库存数量</th>
+				<th data-field="detail" data-formatter="inventoryReportOperateFormatter"
+					data-events="inventoryReportOperateEvents">详细日志</th>
+			</tr>
+		</thead>
+	</table>
+</div>
+
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$("li#inventoryReportMenu").attr("class", "active");
+
+		$('#damage-tag-replace-windows').on('hide.bs.modal', function() {
+			var modalWin = $(this);
+			modalWin.find("form")[0].reset();
+			waringFormError(modalWin, "");
+		});
+
+		$('input#fldHid').on('keypress', function(event) {
+			var key = event.keyCode;
+			if (key == 13) {
+				var fldHidVal = $(this).val();
+				$('table#inventory-report-table').bootstrapTable('refresh', {
+					query : {
+						name : fldHidVal
+					}
+				});
+			}
+		});
+	});
+	
+	window.inventoryReportOperateEvents = {
+			'click .checkDetail' : function(e, value, row, index) {
+				inventoryReportDetail(row);
+			}
+		};
+</script>
+
+<@h.footer/> </#escape>

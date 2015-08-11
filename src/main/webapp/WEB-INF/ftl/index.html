@@ -1,0 +1,156 @@
+<#escape x as x?html> <@h.head/> <@h.navbar withMenu="no"/>
+
+<!-- 表单输入框 -->
+<div class="container">
+	<div class="row" style="text-align: center; padding-top: 10px;">
+		<div class="col-xs-1 col-sm-2 col-md-3">&nbsp;</div>
+		<div class="col-xs-10 col-sm-8 col-md-6"
+			style="border: 1px solid #F1F2F4; background-color: #F1F2F4; border-radius: 5px; padding: 14px;">
+
+			<form method="post" role="form">
+				<div class="form-group">
+					<div class="col-sm-12 control-label"
+						style="height: 126px; text-align: center;">
+						<h2>登录系统</h2>
+						<h3>LOGIN</h3>
+					</div>
+				</div>
+
+				<div class="form-group has-feedback">
+					<div class="col-sm-12">
+						<input class="form-control" id="uname" type="text" value=""
+							placeholder="用户名" autofocus required /> <i
+							class="form-control-feedback glyphicon glyphicon-user glyphicon-custom"></i>
+					</div>
+				</div>
+
+				<div class="form-group has-feedback">
+					<div class="col-sm-12">
+						<input class="form-control" id="upassword" type="password"
+							value="" placeholder="密码" required> <i
+							class="form-control-feedback glyphicon glyphicon-lock glyphicon-custom"></i>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<div class="col-sm-12 control-label" style="height: 16px;">
+						&nbsp;</div>
+				</div>
+
+
+				<div class="form-group  has-feedback">
+					<div class="col-sm-10">
+						<input class="form-control" id="ucheckcode" type="text"
+							placeholder="验证码"><i
+							class="form-control-feedback glyphicon glyphicon-letter-t glyphicon-custom"></i>
+					</div>
+					<div class="col-sm-2">
+						<img id="checkcodeImg"
+							style="left: -25px; top: 4px; position: relative; height: 25px">
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-3 col-md-offset-9">
+						<a href="javascript:void(0)"
+							style="color: #BAAEB8; font-size: 14px;"
+							onclick="javascript:reloadCheckCode()">看不清?换一张</a>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<div class="col-sm-12" style="height: 14px; text-align: left;">
+						<span id="error-text" style="color: #FF0000;"></span>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+	<!-- 提交按钮 -->
+	<div class="row" style="text-align: center;">
+		<div class="col-xs-1 col-sm-2 col-md-3">&nbsp;</div>
+		<div class="col-xs-10 col-sm-8 col-md-6"
+			style="border: 1px solid #F1F2F4; background-color: #F1F2F4; border-radius: 5px; padding: 14px;">
+			<button type="button" class="btn btn-info btn-lg btn-block" id="but"
+				onclick="submitform()">登录</button>
+		</div>
+	</div>
+	<div class="row" style="text-align: center;">&nbsp;</div>
+</div>
+
+
+<script type="text/javascript"> 
+	<!-- 验证账号邮箱 -->
+	function submitform(){
+		var uname = $("input#uname").val();
+		var upassword = $("input#upassword").val();
+		var ucheckcode = $("input#ucheckcode").val();
+		var validateSpan = $("span#error-text");
+		
+		if(!checkText(uname,upassword,ucheckcode,validateSpan)){
+			return;
+		}
+		
+		$.ajax({
+			url : 'user/login.htm',
+			type : 'post',
+			dataType : 'json',
+			data : {
+				uname : uname,
+				upassword : upassword,
+				ucheckcode:ucheckcode
+			},
+			cache : false,
+			success : function(data) {
+				if (data.errors.length == 0) {
+					window.location.replace(data.data + ".htm");
+				}else{
+					validateSpan.html(data.errors[0].msg);
+				}
+			}
+		}); 		 
+	}
+	
+	<!-- 验证用户输入 -->
+	function checkText(uname,upassword,ucheckcode,validateSpan) {  
+		if(uname == ""){
+			validateSpan.html("登录用户名不能为空");
+			return false; 
+		}else if (uname.length >50) {
+			validateSpan.html("登录用户名不能过长");
+			return false;
+		}else {
+			validateSpan.html("");
+		}
+		
+		 
+		if(upassword == ""){
+			validateSpan.html("登录密码不能为空");
+			return false;
+		}else if (upassword.length >50) {
+			validateSpan.html("登录密码不能过长");
+			return false;
+		}else {
+			validateSpan.html("");
+		}
+				 
+		if (ucheckcode.length != 4) {
+			validateSpan.html("验证码错误");
+			return false;
+		}else {
+			validateSpan.html("");
+		} 
+		
+		return true;
+	}
+ 	
+	function reloadCheckCode() {
+		$("img#checkcodeImg").attr("src",
+				'user/checkcode.htm?t=' + new Date().getTime());
+	}
+	
+	$(document).ready(function(){	
+		reloadCheckCode();
+	});
+</script>
+
+<@h.footer/> </#escape>
